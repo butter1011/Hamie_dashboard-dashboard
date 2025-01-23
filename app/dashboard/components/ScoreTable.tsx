@@ -33,8 +33,8 @@ export default function ScoreTable({ viewType, onUserSelect }: ScoreTableProps) 
           default:
             return;
         }
-        
-        if (response && response.data) {
+
+        if (response?.data) {
           setData(response.data);
         }
       } catch (error) {
@@ -65,7 +65,7 @@ export default function ScoreTable({ viewType, onUserSelect }: ScoreTableProps) 
           {data?.userlist?.length || 0} Active Players
         </span>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -88,18 +88,20 @@ export default function ScoreTable({ viewType, onUserSelect }: ScoreTableProps) 
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center">
-                    {index < 3 ? (
-                      <TrophyIcon 
-                        className={`h-5 w-5 mr-2 ${
-                          index === 0 ? 'text-yellow-500' :
+                    <span className="text-gray-900 dark:text-white mr-2">
+                      {index + 1}
+                    </span>
+                    {index < 3 && (
+                      <TrophyIcon
+                        className={`h-5 w-5 ${index === 0 ? 'text-yellow-500' :
                           index === 1 ? 'text-gray-400' :
-                          'text-amber-600'
-                        }`}
+                            'text-amber-600'
+                          }`}
                       />
-                    ) : null}
-                    #{index + 1}
+                    )}
                   </div>
                 </td>
+
                 <td className="px-4 py-3">
                   <div className="flex items-center">
                     <img className="h-10 w-10 rounded-full mr-3" src={`https://api.dicebear.com/6.x/initials/svg?seed=${user.username}`} alt={user.username} />
@@ -113,14 +115,15 @@ export default function ScoreTable({ viewType, onUserSelect }: ScoreTableProps) 
                   <div className="flex items-center justify-end">
                     <span className="font-bold text-gray-900 dark:text-white mr-2">
                       {viewType === 'daily' ? user.dailyBestScore.toLocaleString() :
-                       viewType === 'weekly' ? user.weeklyBestScore.toLocaleString() :
-                       user.bestScore.toLocaleString()}
+                        viewType === 'weekly' ? user.weeklyBestScore.toLocaleString() :
+                          user.bestScore.toLocaleString()}
                     </span>
                     <ArrowUpIcon className="h-4 w-4 text-green-500" />
                   </div>
                 </td>
                 <td className="px-4 py-3 text-right text-gray-500 dark:text-gray-400">
                   {new Date(user.updatedAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',

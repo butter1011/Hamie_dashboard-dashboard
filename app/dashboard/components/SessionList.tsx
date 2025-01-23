@@ -2,13 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, GameSession } from '@/types';
+import { User, LeaderboardData } from '@/types';
 import { fetchDailyData, fetchWeeklyData, fetchTotalData } from '@/lib/api';
 
 interface SessionListProps {
   selectedUser: User | null;
   viewType: string;
 }
+
+interface GameSession {
+  _id: string;
+  user: {
+    _id: string | undefined;
+  } | undefined;
+  score: number;
+  startTime: string;
+  duration: number;
+}
+
 
 export default function SessionList({ selectedUser, viewType }: SessionListProps) {
   const [sessions, setSessions] = useState<GameSession[]>([]);
@@ -17,7 +28,7 @@ export default function SessionList({ selectedUser, viewType }: SessionListProps
   useEffect(() => {
     const fetchSessions = async () => {
       if (!selectedUser) return;
-      
+
       setLoading(true);
       try {
         let response;
@@ -35,9 +46,9 @@ export default function SessionList({ selectedUser, viewType }: SessionListProps
             return;
         }
 
-        if (response && response.data && response.data.sessions) {
+        if (response?.data?.sessions) {
           const userSessions = response.data.sessions.filter(
-            (session: GameSession) => session.user._id === selectedUser._id
+            (session: GameSession) => session.user?._id === selectedUser._id
           );
           setSessions(userSessions);
         }
@@ -63,16 +74,13 @@ export default function SessionList({ selectedUser, viewType }: SessionListProps
   if (!selectedUser) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 h-[600px] flex flex-col items-center justify-center">
-        {/* <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-        </svg> */}
         <p className="text-gray-500 dark:text-gray-400 text-center">Select a user to view their sessions</p>
       </div>
     );
   }
 
   const totalScore = sessions.reduce((sum, session) => sum + session.score, 0);
-  const averageScore = sessions.length > 0 ? Math.round(totalScore / sessions.length) : 0;
+  // const averageScore = sessions.length > 0 ? Math.round(totalScore / sessions.length) : 0;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
@@ -87,14 +95,25 @@ export default function SessionList({ selectedUser, viewType }: SessionListProps
 
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="bg-blue-50 dark:bg-blue-900 rounded-xl p-4">
-          <p className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">Total Score</p>
-          <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">{totalScore.toLocaleString()}</p>
+          <p className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">
+            {viewType.charAt(0).toUpperCase() + viewType.slice(1)} Sum Score
+          </p>
+          <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
+            {totalScore.toLocaleString()}
+          </p>
         </div>
-        <div className="bg-green-50 dark:bg-green-900 rounded-xl p-4">
-          <p className="text-green-600 dark:text-green-400 text-sm font-medium mb-1">Average Score</p>
-          <p className="text-3xl font-bold text-green-700 dark:text-green-300">{averageScore.toLocaleString()}</p>
+        <div className="bg-purple-50 dark:bg-purple-900 rounded-xl p-4">
+          <p className="text-purple-600 dark:text-purple-400 text-sm font-medium mb-1">
+            {viewType.charAt(0).toUpperCase() + viewType.slice(1)} Best Score
+          </p>
+          <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">
+            {viewType === 'daily' && selectedUser.dailyBestScore.toLocaleString()}
+            {viewType === 'weekly' && selectedUser.weeklyBestScore.toLocaleString()}
+            {viewType === 'total' && selectedUser.bestScore.toLocaleString()}
+          </p>
         </div>
       </div>
+
 
       <div className="space-y-4 overflow-y-auto max-h-[400px]">
         {sessions.map((session, index) => (
@@ -119,15 +138,14 @@ export default function SessionList({ selectedUser, viewType }: SessionListProps
                     })}
                   </p>
                 </div>
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    session.score > averageScore
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
-                  }`}
+                {/* <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${session.score > averageScore
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                    : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300'
+                    }`}
                 >
                   {session.score > averageScore ? 'Above Average' : 'Below Average'}
-                </span>
+                </span> */}
               </div>
             </div>
           </motion.div>

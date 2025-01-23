@@ -6,14 +6,20 @@ import { ChartBarIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outli
 interface TabNavigationProps {
   selectedView: string;
   onViewChange: (value: string) => void;
+  handleTabChange: (value: string) => void;
 }
 
-export default function TabNavigation({ selectedView, onViewChange }: TabNavigationProps) {
+export default function TabNavigation({ selectedView, onViewChange, handleTabChange }: TabNavigationProps) {
   const tabs = [
     { id: 'daily', label: 'Daily Stats', icon: ClockIcon },
     { id: 'weekly', label: 'Weekly Overview', icon: CalendarIcon },
     { id: 'total', label: 'All Time Analytics', icon: ChartBarIcon },
   ];
+
+  const handleClick = async (tabId: string) => {
+    onViewChange(tabId);
+    handleTabChange(tabId);
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-2">
@@ -21,7 +27,7 @@ export default function TabNavigation({ selectedView, onViewChange }: TabNavigat
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => onViewChange(tab.id)}
+            onClick={() => handleClick(tab.id)}
             className={`flex-1 relative px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
               selectedView === tab.id
                 ? 'text-white'
@@ -46,4 +52,3 @@ export default function TabNavigation({ selectedView, onViewChange }: TabNavigat
     </div>
   );
 }
-
