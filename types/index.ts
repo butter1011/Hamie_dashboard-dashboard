@@ -1,26 +1,16 @@
-export interface User {
-    _id: string;
-    telegramId: string;
+export interface HighScore {
+    _id: number;
     username: string;
     firstName: string;
     lastName: string;
-    dailyBestScore: number;
-    weeklyBestScore: number;
     bestScore: number;
-    updatedAt: string;
+    // createdAt: string;
   }
   
-  export interface GameSession {
-    _id: string;
-    user: User;
-    score: number;
-    startTime: string;
-    endTime: string;
-  }
-  
-  export interface LeaderboardData {
-    userlist: User[];
-    sessions: GameSession[];
-    currentTime: string;
+  export interface DashboardStats {
+    totalPlayers: number;
+    averageScore: number;
+    highestScore: number;
+    gamesPlayed: number;
   }
   
